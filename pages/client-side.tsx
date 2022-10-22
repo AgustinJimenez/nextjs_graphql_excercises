@@ -1,3 +1,4 @@
+import type { NextPage } from "next";
 import Container from "@mui/material/Container";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,9 +9,12 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import React from "react";
 import TextField from "@mui/material/TextField";
-import { getAllPeopleApi } from "./api/peopleQueries";
+import { getAllPeopleApi, useGetAllPeople } from "./api/peopleQueries";
+import ClientOnly from "../components/ClientOnly";
 
 const Home = ({ people = [] }: any) => {
+  const response = useGetAllPeople();
+  console.log(" home ==> ", response);
   const [firstName, setFirstName] = React.useState("");
 
   return (
@@ -27,8 +31,8 @@ const Home = ({ people = [] }: any) => {
           <TableHead>
             <TableRow>
               {[
-                "Last Name",
                 "First Name",
+                "Last Name",
                 "Email",
                 "Country",
                 "VIP",
@@ -41,49 +45,36 @@ const Home = ({ people = [] }: any) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {people?.map?.(
-              ({
-                first_name,
-                last_name,
-                email,
-                country,
-                id,
-                vip,
-                modified,
-              }) => (
-                <TableRow
-                  key={id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {last_name}
-                  </TableCell>
-                  <TableCell align="right">{first_name}</TableCell>
-                  <TableCell align="right">{email}</TableCell>
-                  <TableCell align="right">{country}</TableCell>
-                  <TableCell align="right">{vip ? "YES" : "NO"}</TableCell>
-                  <TableCell align="right">{modified}</TableCell>
-                </TableRow>
-              )
-            )}
+            <ClientOnly>
+              {people?.map?.(
+                ({
+                  first_name,
+                  last_name,
+                  email,
+                  country,
+                  id,
+                  vip,
+                  modified,
+                }) => (
+                  <TableRow
+                    key={id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {first_name}
+                    </TableCell>
+                    <TableCell align="right">{last_name}</TableCell>
+                    <TableCell align="right">{email}</TableCell>
+                    <TableCell align="right">{country}</TableCell>
+                    <TableCell align="right">{vip ? "YES" : "NO"}</TableCell>
+                    <TableCell align="right">{modified}</TableCell>
+                  </TableRow>
+                )
+              )}
+            </ClientOnly>
           </TableBody>
         </Table>
       </TableContainer>
     </Container>
   );
 };
-
-export async function getStaticProps() {
-  const {
-    data: { people = [] },
-  } = await getAllPeopleApi({
-    search_value: "mar",
-  });
-  return {
-    props: {
-      people,
-    },
-  };
-}
-
-export default Home;
