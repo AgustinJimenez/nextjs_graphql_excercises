@@ -13,7 +13,7 @@ const consoleLink = new ApolloLink((operation, forward) => {
     return data;
   });
 });
-const reportErrors = (errorCallback) =>
+const reportErrors = (errorCallback: any) =>
   new ApolloLink((operation, forward) => {
     const observable = forward(operation);
     // errors will be sent to the errorCallback

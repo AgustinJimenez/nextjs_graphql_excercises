@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { ApolloClient } from "../../src/providers/ApolloClientProvider";
 
 export const getAllPeopleQuery = gql`
@@ -11,15 +11,25 @@ export const getAllPeopleQuery = gql`
       country
       vip
       modified
+      active
     }
   }
 `;
-export const useGetAllPeople = () => useQuery(getAllPeopleQuery);
-
-export const getAllPeopleApi = async ({ search_value }: any) =>
-  await ApolloClient.query({
-    query: getAllPeopleQuery,
+export const useGetAllPeople = ({ search_value }: any) =>
+  useQuery(getAllPeopleQuery, {
     variables: {
       search_value,
     },
   });
+
+export const togglePeopleStatusById = gql`
+  mutation togglePeopleStatus($id: String!) {
+    togglePeopleStatus(id: $id)
+  }
+`;
+
+export const useTogglePeopleStatusById = ({ search_value }: any) => {
+  return useMutation(togglePeopleStatusById, {
+    refetchQueries: [{ query: getAllPeopleQuery, variables: { search_value } }],
+  });
+};
